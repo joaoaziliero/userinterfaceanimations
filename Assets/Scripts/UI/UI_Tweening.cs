@@ -1,4 +1,3 @@
-using NaughtyAttributes;
 using DG.Tweening;
 using R3;
 using System;
@@ -18,13 +17,17 @@ public class UI_Tweening : MonoBehaviour
     [SerializeField] private List<Transform> _icons;
     [SerializeField] private List<TweenSettings> _settings;
 
-    [Button]
+    private void Awake()
+    {
+        Invoke(nameof(HideObjects), 0);
+        Invoke(nameof(ShowObjects), 1);
+    }
+
     private void HideObjects()
     {
         SetAnimations(_icons, new List<TweenSettings>() { new() }).ForEach(obs => obs.Subscribe());
     }
 
-    [Button]
     private void ShowObjects()
     {
         SetAnimations(_icons, _settings).ForEach(obs => obs.Subscribe());

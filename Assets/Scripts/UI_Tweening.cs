@@ -9,27 +9,32 @@ using UnityEngine;
 
 public class UI_Tweening : MonoBehaviour
 {
+    [Serializable]
+    private class TweenSettings
+    {
+        public float endValue = 0, duration = 0, delay = 0;
+    }
+
     [SerializeField] private List<Transform> _icons;
-    [SerializeField] private float _scale;
-    [SerializeField] private float _animationDuration;
-    [SerializeField] private float _animationDelay;
+    [SerializeField] private List<TweenSettings> _settings;
 
     [Button]
-    private void HideIcons()
+    private void HideObjects()
     {
-        SetAnimations(_icons, 0, _animationDelay, _animationDuration).ForEach(obs => obs.Subscribe());
+        SetAnimations(_icons, new List<TweenSettings>() { new() }).ForEach(obs => obs.Subscribe());
     }
 
     [Button]
-    private void ShowIcons()
+    private void ShowObjects()
     {
-        SetAnimations(_icons, 1, _animationDelay, _animationDuration).ForEach(obs => obs.Subscribe());
+        SetAnimations(_icons, _settings).ForEach(obs => obs.Subscribe());
     }
 
-    private List<Observable<Unit>> SetAnimations(List<Transform> icons, float scale, float delay, float duration)
+    private List<Observable<Unit>> SetAnimations(List<Transform> icons, List<TweenSettings> settings)
     {
         return icons
-            .Select((obj, j) => Observable.Timer(TimeSpan.FromSeconds(j * delay)).Do(_ => obj.DOScale(scale, duration)))
+            .Select((icon, j) => Observable.Timer(TimeSpan.FromSeconds(j * settings[j % settings.Count].delay))
+            .Do(_ => icon.DOScale(settings[j % settings.Count].endValue, settings[j % settings.Count].duration)))
             .ToList();
     }
 }
